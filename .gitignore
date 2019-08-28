@@ -12,3 +12,6 @@ dist
 
 # Mac OS
 .DS_Store
+
+# package lock
+package-lock.json
