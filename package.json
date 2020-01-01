@@ -4,6 +4,7 @@
   "description": "Just For Fun",
   "main": "index.js",
   "scripts": {
+    "dev": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,6 +21,16 @@
   },
   "homepage": "https://github.com/floorvest/delekeun#readme",
   "dependencies": {
-    "electron": "^7.1.7"
+    "adbkit": "^2.11.1",
+    "android-platform-tools": "^3.0.2",
+    "bootstrap": "^4.4.1",
+    "electron": "^7.1.7",
+    "electron-rebuild": "^1.8.8",
+    "electron-store": "^5.1.0",
+    "get-port": "^5.1.0",
+    "jquery": "^3.4.1",
+    "minicap-prebuilt": "^2.3.0",
+    "minitouch-prebuilt": "^1.2.0",
+    "usb": "^1.6.2"
   }
 }

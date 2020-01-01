@@ -1,0 +1,24 @@
+.message-no-device {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.message-no-device *{
+    color:#aaa;
+    font-weight:normal;
+}
+
+#center-device {
+    position: absolute;
+    top:50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.loading-spinner {
+    position: fixed;
+    bottom:10px;
+    left: 10px;
+}
