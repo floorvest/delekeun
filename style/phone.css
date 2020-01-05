@@ -1,12 +1,21 @@
+html, body {
+    margin: 0; 
+    height: 100%; 
+    overflow: hidden;
+    user-select: none;
+}
+
 .device {
     height: 100vh;
 }
 .device .header-bar {
     position:absolute;
     top:0;
-    left:0;
+    left:0px;
     width: 100%;
     height: 50px;
+    font-size: 12px;
+    color: #FFF;
 }
 
 .device #canvas {
@@ -21,5 +30,34 @@
     left: 0;
     width: 100%;
     height:50px;
+    
 }
 
+.device .footer-bar * {
+    font-size:25px; 
+    color:#FFF;
+    outline: none !important;
+}
+
+.device .footer-bar .btn {
+    outline: none !important;
+}
+
+.background-disconnect {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.7);
+}
+
+.background-disconnect h3 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80%;
+    color: #FFF;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}

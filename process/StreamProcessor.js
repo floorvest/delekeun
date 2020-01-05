@@ -40,7 +40,7 @@ class StreamProcessor {
             let command = `LD_LIBRARY_PATH=/data/local/tmp/delekeun /data/local/tmp/delekeun/minicap -P ${size.width}x${size.height}@${res.width}x${res.height}/0`
             adbhelper.shell(this.serial, command)
                     .then((output) => {
-                        console.log(output)
+                        // console.log(output)
                     })
 
             adbhelper.getInstance().forward(this.serial, `tcp:${port}`, 'localabstract:minicap')
@@ -49,6 +49,7 @@ class StreamProcessor {
         return {
             port,
             res,
+            size,
             serial: this.serial
         }
     }

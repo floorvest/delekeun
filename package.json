@@ -27,10 +27,13 @@
     "electron": "^7.1.7",
     "electron-rebuild": "^1.8.8",
     "electron-store": "^5.1.0",
+    "font-awesome": "^4.7.0",
     "get-port": "^5.1.0",
+    "ionicons": "^4.6.3",
     "jquery": "^3.4.1",
     "minicap-prebuilt": "^2.3.0",
     "minitouch-prebuilt": "^1.2.0",
+    "protobufjs": "^6.8.8",
     "usb": "^1.6.2"
   }
 }

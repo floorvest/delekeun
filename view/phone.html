@@ -5,6 +5,7 @@
     <title id="hometitle">Delekeun</title>
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
     <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="../node_modules/ionicons/dist/css/ionicons.css"/>
     <!-- <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome/styles.css"/> -->
     <link rel="stylesheet" href="../style/phone.css"/>
   </head>
@@ -13,6 +14,18 @@
         <div class="col-xs-8 col-sm-8 device" style="position:relative;">
 
             <div class="header-bar bg-dark">
+              <div class="row" style=" margin:0px;">
+                <div class="col-1" style="margin-left:10px;">
+                  <i id="battery-indicator-icon" class="ion-ios-battery-charging" style="font-size: 18px;padding-top:32px"></i> <br><span id="battery-indicator" style="font-size:11px;">80%</span>
+                </div>
+                <!-- <div class="col-1" style="margin-left:10px;">
+                  <i class="ion-ios-wifi" style="font-size: 18px;padding-top:32px"></i> <br><span id="connection-indicator" style="font-size:11px;">80%</span>
+                </div>
+
+                <div class="col-1 " style="margin-left:10px;">
+                  <i class="ion-ios-swap" style="font-size: 18px;padding-top:32px"></i> <br><span id="connection-indicator" style="font-size:11px;">80%</span>
+                </div> -->
+              </div>
             </div>
         
             <canvas id="canvas">
@@ -20,15 +33,29 @@
             </canvas>
         
             <div class="footer-bar bg-dark">
-        
+              <div class="row">
+                <div class="col-4">
+                  <button id="button-menu" class="btn btn-clear btn-block"><i class="ion-ios-menu"></i></button>
+                </div>
+                <div class="col-4">
+                  <button id="button-home" class="btn btn-clear btn-block"><i class="ion-ios-home"></i></button>
+                </div>
+                <div class="col-4">
+                  <button id="button-back" class="btn btn-clear btn-block"><i class="ion-ios-arrow-back"></i></button>
+                </div>
+    
+              </div>
             </div>
 
         </div>
         <div class="col-xs-4 col-sm-4 control">
-
+          
         </div>
+        
     </div>
-
+    <div class="background-disconnect" style="display: none;">
+      <h3>Device Disconnected, please close this window</h3>
+    </div>
   </body>
   <script src="../controller/phone.js"></script>
 </html>

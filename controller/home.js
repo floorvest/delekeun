@@ -6,6 +6,7 @@ const adbhelper = remote.require('./process/AdbHelper')
 const DeviceProcessor = remote.require('./process/DeviceProcessor')
 const StreamProcessor = remote.require('./process/StreamProcessor')
 const TouchProcessor = remote.require('./process/TouchProcessor')
+const STFServiceProcessor = remote.require('./process/STFServiceProcessor')
 
 class HomeController {
     constructor() {
@@ -20,8 +21,15 @@ class HomeController {
         this.homeTitle.innerHTML = config.getInstance().get('appName');
 
         this.loadedDevices = {}
+        this.readyDevices = []
         
         this.initAdb();
+    }
+
+    findDeviceIndex (serial) {
+        return this.readyDevices.findIndex((device) => {
+            return device.id == serial
+        })
     }
 
     async initAdb() {
@@ -31,45 +39,87 @@ class HomeController {
 
         await this.processDevice(lists);
 
-        let self = this
+        adbhelper.getInstance().trackDevices()
+            .then((tracker) => {
 
-        adbhelper.watchList((devices) => {
+                tracker.on('add', async (device) => {
+                    console.log(device)
+                    // if (device.type)
+
+                    setTimeout(async () => {
+                        device = await this.processDeviceOne(device)
+
+                        this.renderView()
+                    }, 1000)
+                })
+
+                tracker.on('remove', (device) => { 
+                    this.removeDevice(device)
+                })
+            })
+            .catch((err) => {
+                console.error(err)
+            })
+        
+
+        // adbhelper.watchList((devices) => {
             
-            this.processDevice(devices);
-        }, (ev) => {
-            self.loadingSpinner.show()
-        })
+        //     this.processDevice(devices);
+        // }, (ev) => {
+        //     self.loadingSpinner.show()
+        // })
     }
 
-    async processDevice(devices) {
-        for(let key in devices) {
-            let device = devices[key]
+    async removeDevice(device) {
+        let serial = device.id
+        let index = this.findDeviceIndex(device.id)
 
-            let deviceProcessor = new DeviceProcessor(device.id)
-
-            await deviceProcessor.loadProp()
-
-            let ready = await deviceProcessor.checkReadines()
-
-            if (!ready.minicap) {
-                await deviceProcessor.installMinicap()
-            }
-
-            if (!ready.minitouch) {
-                await deviceProcessor.installMinitouch()
-            }
-
-            this.loadedDevices[device.id] = deviceProcessor;
-
-            device.model = deviceProcessor.getProperties('ro.product.model') 
+        if (index != -1) {
+            this.readyDevices.splice(index, 1)
+            ipcRenderer.send('deviceDisconnect', serial) 
         }
 
-        if (devices.length > 0) {
+        this.renderView()
+    }
+
+    async processDeviceOne(device) {
+        let deviceProcessor = new DeviceProcessor(device.id)
+
+        await deviceProcessor.loadProp()
+
+        let ready = await deviceProcessor.checkReadines()
+
+        if (!ready.minicap) {
+            await deviceProcessor.installMinicap()
+        }
+
+        if (!ready.minitouch) {
+            await deviceProcessor.installMinitouch()
+        }
+
+        if (!ready.service_agent) {
+            await deviceProcessor.installStfService()
+        }
+
+        this.loadedDevices[device.id] = deviceProcessor;
+
+        device.model = deviceProcessor.getProperties('ro.product.model')
+        device.name = deviceProcessor.getProperties('ro.product.name')
+
+        if (this.findDeviceIndex(device.id) == -1) {
+            this.readyDevices.push(device)
+        }
+        
+        return device
+    }
+
+    async renderView() {
+        if (this.readyDevices.length > 0) {
             this.messageNoDevice.hide()
-            if (devices.length == 1) {
-                this.renderCenter(devices[0])
+            if (this.readyDevices.length == 1) {
+                this.renderCenter(this.readyDevices[0])
             } else {
-                this.renderDevices(devices)
+                this.renderDevices(this.readyDevices)
             }
         } else {
             this.messageNoDevice.show()
@@ -79,6 +129,18 @@ class HomeController {
         this.loadingSpinner.hide()
     }
 
+    async processDevice(devices) {
+        
+        for(let key in devices) {
+            let device = devices[key]
+
+            await this.processDeviceOne(device)
+            // this.readyDevices.push(device)
+        }
+
+        this.renderView()
+    }
+
     renderCenter(device) {
         let modelName = this.centerDevice.children('.model-name')
         let buttonView = this.centerDevice.find('.btn-view')
@@ -86,24 +148,41 @@ class HomeController {
 
         buttonView.on('click', async () => {
 
+            let spinner = buttonView.find('.spinner-border')
+            spinner.show()
+
+            buttonView.attr('disabled', 'true')
+
             let processor = this.loadedDevices[device.id]
 
             let streamer = new StreamProcessor(device.id, processor)
 
             let toucher = new TouchProcessor(device.id, processor)
 
+            let stfService = new STFServiceProcessor(device.id, processor)
+
             let streamConfig = await streamer.stream()
 
             let toucherConfig = await toucher.run()
 
-            ipcRenderer.send('deviceRun', {
+            let stfConfig = await stfService.run()
+
+            let deviceData = {
                 device,
                 processor: this.loadedDevices[device.id],
                 stream: streamConfig,
                 streamProcessor: streamer,
-                touch: toucherConfig
-            })
+                touch: toucherConfig,
+                stfConfig,
+                stfService
+            }
 
+            ipcRenderer.send('deviceRun',deviceData) 
+
+            console.log(deviceData)
+
+            spinner.hide()
+            buttonView.removeAttr('disabled')
         }
         );
 

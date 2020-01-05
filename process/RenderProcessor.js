@@ -134,7 +134,7 @@ class RenderProcessor {
                     this.error('Frame body does not start with JPG header')
                   }
                   
-                  console.log('Send to main stream')
+                  // console.log('Send to main stream')
                   self.listener(this.frameBody)
       
                   cursor += this.frameBodyLength
@@ -142,7 +142,7 @@ class RenderProcessor {
                   this.frameBody = new Buffer(0)
                 }
                 else {
-                  console.info('body(len=%d)', len - cursor)
+                  // console.info('body(len=%d)', len - cursor)
       
                   this.frameBody = Buffer.concat([
                     this.frameBody

@@ -1,27 +1,27 @@
 const adb = require('android-platform-tools')
-const usbDetect = require('usb')
+// const usbDetect = require('usb')
 const adbkit = require('adbkit')
 const config = require('./Configuration')
 
 class AdbHelper {
 
-    watchList(ev, onDetect) {
-        usbDetect.on('attach', (event) => {
-            onDetect(event)
-            this.client.listDevices()
-            .then((re) => {
-                ev(re);
-            })
-        })
+    // watchList(ev, onDetect) {
+    //     usbDetect.on('attach', (event) => {
+    //         onDetect(event)
+    //         this.client.listDevices()
+    //         .then((re) => {
+    //             ev(re);
+    //         })
+    //     })
 
-        usbDetect.on('detach', (event) => {
-            onDetect(event)
-            this.client.listDevices()
-            .then((re) => {
-                ev(re);
-            })
-        })
-    }
+    //     usbDetect.on('detach', (event) => {
+    //         onDetect(event)
+    //         this.client.listDevices()
+    //         .then((re) => {
+    //             ev(re);
+    //         })
+    //     })
+    // }
 
     getList() {
         return this.client.listDevices()

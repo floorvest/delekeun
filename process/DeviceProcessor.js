@@ -9,6 +9,7 @@ class DeviceProcessor {
         this.ready = false
         this.minicapReady = false
         this.minitouchReady = false
+        this.serviceAndAgentReady = false
         this.readyToUse = false
         
         this.tmpBinaryPath = '/data/local/tmp/delekeun'
@@ -43,12 +44,28 @@ class DeviceProcessor {
     }
 
     /**
+     * Install Stf Service
+     */
+    async installStfService() {
+        let serviceApkPath = this.getPath('vendor/STFService.apk')
+
+        try {
+            await adbhelper.getInstance().install(this.serial, serviceApkPath)
+            this.serviceAndAgentReady = true
+        } catch (e) {
+            this.serviceAndAgentReady = false
+        }
+
+    }
+
+    /**
      * Check if device already have minicap or minitouch or STFService
      */
     async checkReadines () {
         let ready = {
             minicap: this.minicapReady,
-            minitouch: this.minitouchReady
+            minitouch: this.minitouchReady,
+            service_agent: this.serviceAndAgentReady
         }
 
         let files = await adbhelper.getInstance()
@@ -61,6 +78,12 @@ class DeviceProcessor {
                 ready.minitouch = true
             }
         })
+
+        let res = await adbhelper.shell(this.serial, 'pm path jp.co.cyberagent.stf')
+
+        if (res.trim() != '') {
+            ready.service_agent = true
+        }
 
         return ready
     }
@@ -137,7 +160,9 @@ class DeviceProcessor {
     async getSize() {
         let response = {
             width: 0,
-            height: 0
+            height: 0,
+            displayWidth: 0,
+            displayHeight: 0
         }
 
         let size = await adbhelper.shell(this.serial, 'dumpsys window')
@@ -154,6 +179,17 @@ class DeviceProcessor {
             }
         } else {
             size = size[0].replace('cur=', '')
+        }
+
+        let sizeDisplay = await adbhelper.shell(this.serial, 'dumpsys window')
+        sizeDisplay = sizeDisplay.match(/init=[0-9]+x[0-9]+/g)
+
+        if (sizeDisplay.length > 0) {
+            let wh = sizeDisplay[0].replace('init=', '').split('x')
+            console.log(wh)
+
+            response.displayWidth = parseInt(wh[0])
+            response.displayHeight = parseInt(wh[1])
         }
 
         let wh = size.split('x')

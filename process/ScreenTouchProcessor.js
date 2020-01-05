@@ -3,7 +3,7 @@ const net = require('net')
 class ScreenTouchProcessor {
     constructor(config) {
         this.config = config
-        console.log(config)
+        
         setTimeout(() => {
             this.connect()
         }, 800)
@@ -17,15 +17,27 @@ class ScreenTouchProcessor {
         this.stream.setEncoding('utf8')
 
         this.stream.on('error', console.error)
+    }
 
-        // this.click(0, 0)
-        // this.up()
+    end () {
+        if (this.stream != null) {
+            this.stream.end()
+        }
+    }
+
+    sleep(ms) {
+        return(
+            new Promise(function(resolve, reject)
+            {
+                setTimeout(function() { resolve(); }, ms);
+            })
+        );
     }
 
     execute(command) {
-        
-        this.stream.write(`${command} \nc \n`)
-        console.log(command)
+        this.sleep(10).then(() => {
+            this.stream.write(`${command} \nc \n`)
+        })
     }
 
     click(x, y) {

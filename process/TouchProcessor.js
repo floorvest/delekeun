@@ -18,14 +18,32 @@ class TouchProcessor {
         let port = await this.findOpenPort()
         let config = {
             port,
+            maxPointer: {}
         }
 
         let command = `/data/local/tmp/delekeun/minitouch`
-        adbhelper.shell(this.serial, command)
-                .then((output) => {
-                    console.log('MINITOUCH!')
-                    console.log(output)
+        let size = await adbhelper.getInstance().shell(this.serial, command)
+        .then((stream) => {
+            
+
+            let res = new Promise((resolve) => {
+                stream.on("data", (data) => {
+                    let m = data.toString().match(/[0-9]+x[0-9]+/g)
+
+                    if (m != null && m.length > 0) {
+                        m = m[0].split('x')
+                        resolve({
+                            x: parseInt(m[0]),
+                            y: parseInt(m[1])
+                        })
+                    }
                 })
+            })
+            
+            return res
+        })
+
+        config.maxPointer = size
 
         await adbhelper.getInstance().forward(this.serial, `tcp:${config.port}`, 'localabstract:minitouch')
 
